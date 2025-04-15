@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Panel - HIDDEN ULTIMATE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    * {
+      margin: 0; padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: background 0.4s, color 0.4s;
+    }
+    body.light-mode {
+      background: linear-gradient(to right, #f2f2f2, #d9e4f5);
+      color: #000;
+    }
+    .main-title {
+      text-align: center;
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      animation: fadeIn 1s ease-in-out;
+      letter-spacing: 2px;
+      color: #00ffe7;
+      text-shadow: 0 0 10px #00ffe7, 0 0 20px #00ffe7;
+    }
+    body.light-mode .main-title {
+      color: #2c3e50;
+      text-shadow: none;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+    }
+    .theme-toggle label {
+      font-size: 22px;
+      cursor: pointer;
+      color: inherit;
+    }
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+    }
+    .panel-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    body.light-mode .panel-card {
+      background: rgba(255,255,255,0.95);
+      color: #000;
+    }
+    .panel-card h2 {
+      font-size: 24px;
+      margin-bottom: 25px;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .input-group label {
+      margin-right: 10px;
+      font-size: 16px;
+      color: #ccc;
+      width: 90px;
+    }
+    .input-group input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: inherit;
+      font-size: 16px;
+      padding: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #3498db;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .loading {
+      background-color: #f39c12;
+      color: #fff;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="main-title">HIDDEN ULTIMATE</h1>
+
+  <div class="theme-toggle">
+    <input type="checkbox" id="toggleTheme" hidden>
+    <label for="toggleTheme" title="Toggle Light/Dark Mode">
+      <i class="fas fa-moon" id="themeIcon"></i>
+    </label>
+  </div>
+
+  <div class="container">
+    <div class="panel-card">
+      <h2>User Panel</h2>
+
+      <div class="status" id="status">
+        <p><strong>Status:</strong></p>
+        <p id="status-text">Aimbot: OFF | Sniper Scope: OFF | Location: OFF | Aimbot Load: OFF</p>
+      </div>
+
+      <button type="button" id="aimbotLoadToggle">Toggle Aimbot Load</button>
+
+      <button type="button" id="aimbotToggle">Toggle Aimbot</button>
+      <button type="button" id="sniperScopeToggle">Toggle Sniper Scope</button>
+      <button type="button" id="disableSniperScopeToggle">Disable Sniper Scope</button>
+      <button type="button" id="locationToggle">Toggle Location</button>
+
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle
+    document.getElementById("toggleTheme").addEventListener("change", function () {
+      document.body.classList.toggle("light-mode");
+      document.getElementById("themeIcon").classList.toggle("fa-moon");
+      document.getElementById("themeIcon").classList.toggle("fa-sun");
+    });
+
+    // Initial states
+    let aimbotStatus = "OFF";
+    let sniperScopeStatus = "OFF";
+    let locationStatus = "OFF";
+    let aimbotLoadStatus = "OFF";
+
+    function updateStatus() {
+      document.getElementById("status-text").innerText = 
+        `Aimbot: ${aimbotStatus} | Sniper Scope: ${sniperScopeStatus} | Location: ${locationStatus} | Aimbot Load: ${aimbotLoadStatus}`;
+    }
+
+    // Update status and make fetch requests
+    function sendFetchRequest(endpoint, element, status) {
+      element.classList.add("loading");
+      fetch(endpoint)
+        .then(res => res.text())
+        .then(data => {
+          console.log(data);
+          status = (status === "OFF") ? "ON" : "OFF";
+          updateStatus();
+        })
+        .catch(err => {
+          console.error("Error:", err);
+        })
+        .finally(() => {
+          element.classList.remove("loading");
+        });
+    }
+
+    document.getElementById("aimbotLoadToggle").addEventListener("click", function () {
+      aimbotLoadStatus = (aimbotLoadStatus === "OFF") ? "ON" : "OFF";
+      updateStatus();
+      sendFetchRequest(`http://localhost:3000/aimbot/${aimbotLoadStatus.toLowerCase()}`, this, aimbotLoadStatus);
+    });
+
+    document.getElementById("aimbotToggle").addEventListener("click", function () {
+      aimbotStatus = (aimbotStatus === "OFF") ? "ON" : "OFF";
+      updateStatus();
+      sendFetchRequest(`http://localhost:3000/aimbottoggle/${aimbotStatus.toLowerCase()}`, this, aimbotStatus);
+    });
+
+    document.getElementById("sniperScopeToggle").addEventListener("click", function () {
+      sniperScopeStatus = (sniperScopeStatus === "OFF") ? "ON" : "OFF";
+      updateStatus();
+      sendFetchRequest(`http://localhost:3000/sniper/${sniperScopeStatus.toLowerCase()}`, this, sniperScopeStatus);
+    });
+
+    document.getElementById("disableSniperScopeToggle").addEventListener("click", function () {
+      sniperScopeStatus = "OFF";
+      updateStatus();
+      sendFetchRequest("http://localhost:3000/sniper/off", this, sniperScopeStatus);
+    });
+
+    document.getElementById("locationToggle").addEventListener("click", function () {
+      locationStatus = (locationStatus === "OFF") ? "ON" : "OFF";
+      updateStatus();
+      sendFetchRequest(`http://localhost:3000/location/${locationStatus.toLowerCase()}`, this, locationStatus);
+    });
+  </script>
+
+</body>
+</html>
